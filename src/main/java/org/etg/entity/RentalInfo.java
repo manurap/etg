@@ -1,9 +1,8 @@
 package org.etg.entity;
 
 import org.etg.service.RentalStrategy;
-import org.etg.service.impl.RegularRental;
+import org.etg.service.impl.RentalCalculationService;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
  * processing moving rental information
  */
 public class RentalInfo {
+  private final RentalCalculationService calculationService = new RentalCalculationService();
   private static final Map<String, Movie> movies = Map.of(
           "F001", new Movie("You've Got Mail", MovieType.REGULAR),
           "F002", new Movie("Matrix", MovieType.REGULAR),
@@ -18,27 +18,29 @@ public class RentalInfo {
           "F004", new Movie("Fast & Furious X", MovieType.NEW_RELEASE)
   );
 
-
   public String statement(Customer customer) {
-    double totalAmount = 0;
-    int frequentEnterPoints = 0;
-    StringBuilder result = new StringBuilder("Rental Record for " + customer.name() + "\n");
+    var rentalDetails = customer.rentals().stream()
+            .map(rental -> {
+              Movie movie = movies.get(rental.movieId());
+              double amount = calculationService.calculateAmount(movie, rental.days());
+              int points = calculationService.calculateFrequentPoints(movie, rental.days());
 
-    for (MovieRental rental : customer.rentals()) {
-      Movie movie = movies.get(rental.movieId());
-      RentalStrategy strategy = movie.getStrategy();
+              return new Object() {
+                final double totalAmount = amount;
+                final int frequentPoints = points;
+                final String details = "\t" + movie.title() + "\t" + amount + "\n";
+              };
+            })
+            .toList();
 
-      double amount = strategy.calculatePrice(rental.days());
-      int points = strategy.generatePoints(rental.days());
+    // Calculate totals
+    double totalAmount = rentalDetails.stream().mapToDouble(r -> r.totalAmount).sum();
+    int frequentEnterPoints = rentalDetails.stream().mapToInt(r -> r.frequentPoints).sum();
+    String details = rentalDetails.stream().map(r -> r.details).collect(Collectors.joining());
 
-      frequentEnterPoints += points;
-      result.append("\t").append(movie.title()).append("\t").append(amount).append("\n");
-      totalAmount += amount;
-    }
-
-    result.append("Amount owed is ").append(totalAmount).append("\n");
-    result.append("You earned ").append(frequentEnterPoints).append(" frequent points\n");
-
-    return result.toString();
+    return "Rental Record for " + customer.name() + "\n" +
+            details +
+            "Amount owed is " + totalAmount + "\n" +
+            "You earned " + frequentEnterPoints + " frequent points\n";
   }
 }

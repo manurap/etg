@@ -1,6 +1,5 @@
 package org.etg.entity;
 
-import org.etg.service.RentalStrategy;
 import org.etg.service.impl.RentalCalculationService;
 
 import java.util.Map;

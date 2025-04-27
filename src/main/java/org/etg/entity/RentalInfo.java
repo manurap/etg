@@ -9,37 +9,31 @@ import java.util.stream.Collectors;
  * processing moving rental information
  */
 public class RentalInfo {
-  private final RentalCalculationService calculationService = new RentalCalculationService();
-  private static final Map<String, Movie> movies = Map.of(
-          "F001", new Movie("You've Got Mail", MovieType.REGULAR),
-          "F002", new Movie("Matrix", MovieType.REGULAR),
-          "F003", new Movie("Cars", MovieType.CHILDREN),
-          "F004", new Movie("Fast & Furious X", MovieType.NEW_RELEASE)
-  );
+    private final RentalCalculationService calculationService = new RentalCalculationService();
 
-  public String statement(Customer customer) {
-    var rentalDetails = customer.rentals().stream()
-            .map(rental -> {
-              Movie movie = movies.get(rental.movieId());
-              double amount = calculationService.calculateAmount(movie, rental.days());
-              int points = calculationService.calculateFrequentPoints(movie, rental.days());
+    public String statement(Customer customer) {
+        var rentalDetails = customer.rentals().stream()
+                .map(rental -> {
+                    Movie movie = calculationService.getMovie(rental);
+                    double amount = calculationService.calculateAmount(rental);
+                    int points = calculationService.calculateFrequentPoints(rental);
 
-              return new Object() {
-                final double totalAmount = amount;
-                final int frequentPoints = points;
-                final String details = "\t" + movie.title() + "\t" + amount + "\n";
-              };
-            })
-            .toList();
+                    return new Object() {
+                        final double totalAmount = amount;
+                        final int frequentPoints = points;
+                        final String details = "\t" + movie.title() + "\t" + amount + "\n";
+                    };
+                })
+                .toList();
 
-    // Calculate totals
-    double totalAmount = rentalDetails.stream().mapToDouble(r -> r.totalAmount).sum();
-    int frequentEnterPoints = rentalDetails.stream().mapToInt(r -> r.frequentPoints).sum();
-    String details = rentalDetails.stream().map(r -> r.details).collect(Collectors.joining());
+        // Calculate totals
+        double totalAmount = rentalDetails.stream().mapToDouble(r -> r.totalAmount).sum();
+        int frequentEnterPoints = rentalDetails.stream().mapToInt(r -> r.frequentPoints).sum();
+        String details = rentalDetails.stream().map(r -> r.details).collect(Collectors.joining());
 
-    return "Rental Record for " + customer.name() + "\n" +
-            details +
-            "Amount owed is " + totalAmount + "\n" +
-            "You earned " + frequentEnterPoints + " frequent points\n";
-  }
+        return "Rental Record for " + customer.name() + "\n" +
+                details +
+                "Amount owed is " + totalAmount + "\n" +
+                "You earned " + frequentEnterPoints + " frequent points\n";
+    }
 }

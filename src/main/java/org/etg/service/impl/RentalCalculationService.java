@@ -1,17 +1,23 @@
 package org.etg.service.impl;
 
 import org.etg.entity.Movie;
+import org.etg.entity.MovieRental;
 
 /**
  * Rental calculation service
  */
 public class RentalCalculationService {
-    public double calculateAmount(Movie movie, int days) {
-        return movie.getStrategy().calculatePrice(days);
+    private final MovieService movieService = MovieService.getInstance();
+
+    public double calculateAmount(MovieRental rental) {
+        return getMovie(rental).getStrategy().calculatePrice(rental.days());
     }
 
-    public int calculateFrequentPoints(Movie movie, int days) {
-        return movie.getStrategy().generatePoints(days);
+    public int calculateFrequentPoints(MovieRental rental) {
+        return getMovie(rental).getStrategy().generatePoints(rental.days());
     }
 
+    public Movie getMovie(MovieRental movieRental){
+        return movieService.getMovie(movieRental.movieId());
+    }
 }

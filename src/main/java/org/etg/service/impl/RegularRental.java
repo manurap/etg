@@ -1,27 +1,29 @@
 package org.etg.service.impl;
 
 import org.etg.service.RentalStrategy;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Rental strategy for regular's movies.
  */
 public class RegularRental implements RentalStrategy {
-    private static final double DEFAULT_PRICE = 2;
-    private static final double PRICE_PER_DAY = 1.5;
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(2);
+    private static final BigDecimal PRICE_PER_DAY = BigDecimal.valueOf(1.5);
     private static final int MAX_DAYS_FOR_DEFAULT_PRICE = 2;
 
     @Override
-    public double calculatePrice(int days) {
+    public BigDecimal calculatePrice(int days) {
         if (days <= 0) {
-            return 0;
+            return BigDecimal.ZERO;
         }
 
-        double amount = DEFAULT_PRICE;
+        BigDecimal amount = DEFAULT_PRICE;
         if (days > MAX_DAYS_FOR_DEFAULT_PRICE) {
-            amount += (days - MAX_DAYS_FOR_DEFAULT_PRICE) * PRICE_PER_DAY;
+            amount = amount.add(PRICE_PER_DAY.multiply(BigDecimal.valueOf(days - MAX_DAYS_FOR_DEFAULT_PRICE)));
         }
 
-        return amount;
+        return amount.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override

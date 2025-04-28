@@ -2,16 +2,22 @@ package org.etg.service.impl;
 
 import org.etg.service.RentalStrategy;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Rental strategy for NewRelease's movies.
  */
 public class NewReleaseRental implements RentalStrategy {
-    private static final int PRICE_PER_DAY = 3;
+    private static final BigDecimal PRICE_PER_DAY = BigDecimal.valueOf(3);
     private static final int MIN_DAYS_FOR_EXTRA_POINT = 2;
 
     @Override
-    public double calculatePrice(int days) {
-        return days * PRICE_PER_DAY;
+    public BigDecimal calculatePrice(int days) {
+        if (days <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return PRICE_PER_DAY.multiply(BigDecimal.valueOf(days)).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override

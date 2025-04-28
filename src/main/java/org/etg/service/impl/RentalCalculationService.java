@@ -3,13 +3,15 @@ package org.etg.service.impl;
 import org.etg.entity.Movie;
 import org.etg.entity.MovieRental;
 
+import java.math.BigDecimal;
+
 /**
  * Rental calculation service
  */
 public class RentalCalculationService {
     private final MovieService movieService = MovieService.getInstance();
 
-    public double calculateAmount(MovieRental rental) {
+    public BigDecimal calculateAmount(MovieRental rental) {
         return getMovie(rental).getStrategy().calculatePrice(rental.days());
     }
 

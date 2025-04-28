@@ -2,7 +2,7 @@ package org.etg.entity;
 
 import org.etg.service.impl.RentalCalculationService;
 
-import java.util.Map;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 /**
@@ -15,21 +15,25 @@ public class RentalInfo {
         var rentalDetails = customer.rentals().stream()
                 .map(rental -> {
                     Movie movie = calculationService.getMovie(rental);
-                    double amount = calculationService.calculateAmount(rental);
+                    BigDecimal amount = calculationService.calculateAmount(rental);
                     int points = calculationService.calculateFrequentPoints(rental);
 
-                    return new Object() {
-                        final double totalAmount = amount;
-                        final int frequentPoints = points;
-                        final String details = "\t" + movie.title() + "\t" + amount + "\n";
-                    };
+                    return new RentalDetail("\t" + movie.title() + "\t" + amount + "\n", amount, points);
                 })
                 .toList();
 
-        // Calculate totals
-        double totalAmount = rentalDetails.stream().mapToDouble(r -> r.totalAmount).sum();
-        int frequentEnterPoints = rentalDetails.stream().mapToInt(r -> r.frequentPoints).sum();
-        String details = rentalDetails.stream().map(r -> r.details).collect(Collectors.joining());
+        // Calculate totals using BigDecimal
+        BigDecimal totalAmount = rentalDetails.stream()
+                .map(RentalDetail::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        int frequentEnterPoints = rentalDetails.stream()
+                .mapToInt(RentalDetail::points)
+                .sum();
+
+        String details = rentalDetails.stream()
+                .map(RentalDetail::details)
+                .collect(Collectors.joining());
 
         return "Rental Record for " + customer.name() + "\n" +
                 details +

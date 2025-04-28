@@ -1,5 +1,7 @@
 package org.etg.service;
 
+import java.math.BigDecimal;
+
 public interface RentalStrategy {
 
     /**
@@ -7,7 +9,7 @@ public interface RentalStrategy {
      * @param days number of rented days
      * @return price
      */
-    double calculatePrice(int days);
+    BigDecimal calculatePrice(int days);
 
     /**
      * calculate points based on rented days

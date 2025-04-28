@@ -1,7 +1,6 @@
 package org.etg.entity;
 
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,10 +18,10 @@ public class RentalInfoTest {
 
         String expectedStatement = """
             Rental Record for Test A
-            \tYou've Got Mail\t3.5
-            \tMatrix\t2.0
-            \tFast & Furious X\t12.0
-            Amount owed is 17.5
+            \tYou've Got Mail\t3.50
+            \tMatrix\t2.00
+            \tFast & Furious X\t12.00
+            Amount owed is 17.50
             You earned 4 frequent points
             """;
 

@@ -7,6 +7,9 @@ import org.etg.exception.MovieNotFoundException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service class for managing movie data.
+ */
 public class MovieService {
     private static class SingletonHelper {
         private static final MovieService INSTANCE = new MovieService();
@@ -26,6 +29,11 @@ public class MovieService {
         return SingletonHelper.INSTANCE; // Thread-safe lazy initialization
     }
 
+    /**
+     * Get movie by id
+     * @param movieId
+     * @return
+     */
     public Movie getMovie(String movieId) {
         Movie movie = movies.get(movieId);
         if (movie == null) {
@@ -44,7 +52,10 @@ public class MovieService {
         movies.remove(movieId);
     }
 
-    /** Get all movies */
+    /**
+     * Get All Movies
+     * @return list of Movies
+     */
     public Map<String, Movie> getAllMovies() {
         return Map.copyOf(movies); // Return an immutable copy
     }

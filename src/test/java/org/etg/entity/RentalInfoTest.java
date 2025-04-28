@@ -27,4 +27,17 @@ public class RentalInfoTest {
 
         assertEquals(expectedStatement, rentalInfo.statement(customer));
     }
+
+    @Test
+    void testCustomerWithEmptyMovieRentalList() {
+        Customer customer = new Customer("Empty Rentals User", List.of()); // Empty list
+
+        String expectedStatement = """
+            Rental Record for Empty Rentals User
+            Amount owed is 0
+            You earned 0 frequent points
+            """;
+
+        assertEquals(expectedStatement, rentalInfo.statement(customer));
+    }
 }
